@@ -48,7 +48,7 @@ class OrderIntegrationTest {
                 .content(objectMapper.writeValueAsString(sampleItems));
 
         mockMvc.perform(request)
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.status").value("PENDING"))
                 .andExpect(jsonPath("$.items.length()").value(2));
 
@@ -65,7 +65,7 @@ class OrderIntegrationTest {
         mockMvc.perform(post("/api/orders")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(sampleItems)))
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated());
 
         Long orderId = orderRepository.findAll().get(0).getId();
 
@@ -82,7 +82,7 @@ class OrderIntegrationTest {
         mockMvc.perform(post("/api/orders")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(sampleItems)))
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated());
 
         Long id = orderRepository.findAll().get(0).getId();
 
@@ -102,7 +102,7 @@ class OrderIntegrationTest {
         mockMvc.perform(post("/api/orders")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(sampleItems)))
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated());
 
         Long id = orderRepository.findAll().get(0).getId();
 
@@ -122,14 +122,14 @@ class OrderIntegrationTest {
         mockMvc.perform(post("/api/orders")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(sampleItems)))
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated());
 
         var order = orderRepository.findAll().get(0);
         order.setStatus(OrderStatus.PROCESSING);
         orderRepository.save(order);
 
         mockMvc.perform(post("/api/orders/" + order.getId() + "/cancel"))
-                .andExpect(status().isBadRequest())
+                .andExpect(status().isConflict())
                 .andExpect(content().string("Cannot cancel this order (not pending or not found)"));
     }
 
@@ -140,7 +140,7 @@ class OrderIntegrationTest {
         mockMvc.perform(post("/api/orders")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(sampleItems)))
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated());
 
         var order = orderRepository.findAll().get(0);
         assertThat(order.getStatus()).isEqualTo(OrderStatus.PENDING);
